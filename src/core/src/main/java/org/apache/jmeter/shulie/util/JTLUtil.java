@@ -273,4 +273,20 @@ public abstract class JTLUtil {
                 && respCost >= PressurePtlFileConfig.defaultConfig.getTimeoutThreshold();
     }
 
+
+    /**
+     * 采样率、错误请求、耗时相结合采集压测流量
+     *
+     * @param traceId
+     * @param si
+     * @param result
+     * @return
+     */
+    public static boolean isTraceSampled(String traceId, final int si, SampleResult result) {
+        if (isTraceSampled(traceId, si) || ifWrite("200".equals(result.getResponseCode()), result.getTime())) {
+            return true;
+        }
+        return false;
+    }
+
 }

@@ -1118,7 +1118,7 @@ public final class CSVSaveService {
                 performanceTest = true;
             }
             TraceBizData traceBizData = TraceBizData.create(traceId, reportId, performanceTest);
-            if (JTLUtil.isTraceSampled(traceId, samplingInterval)) {
+            if (JTLUtil.isTraceSampled(traceId, samplingInterval, sampleResult)) {
                 writeLog(sampleResult, out, saveConfig, traceBizData);
             }
         }
@@ -1143,7 +1143,7 @@ public final class CSVSaveService {
                 }
             }
             TraceBizData traceBizData = TraceBizData.create(traceId, reportId, performanceTest);
-            if (JTLUtil.isTraceSampled(traceId, samplingInterval)) {
+            if (JTLUtil.isTraceSampled(traceId, samplingInterval, sampleResult)) {
                 writeLog(sampleResult, out, saveConfig, traceBizData);
             }
         }
@@ -1170,9 +1170,7 @@ public final class CSVSaveService {
             GlobalVariables.logBlockQueue.offer(resultLog);
         }
         if (PressurePtlFileConfig.defaultConfig.isPtlEnable()) {
-            if (JTLUtil.ifWrite("200".equals(result.getResponseCode()), result.getTime())) {
-                out.println(resultLog + "\r");
-            }
+            out.println(resultLog + "\r");
         }
     }
 }
