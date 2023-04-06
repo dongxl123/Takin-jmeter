@@ -17,34 +17,14 @@
 
 package org.apache.jmeter.reporters;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.RandomAccessFile;
-import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
+import io.shulie.jmeter.tool.amdb.GlobalVariables;
+import io.shulie.jmeter.tool.amdb.log.data.pusher.LogPusher;
 import io.shulie.jmeter.tool.amdb.utils.PradarCoreUtils;
+import io.shulie.jmeter.tool.executors.ExecutorServiceFactory;
 import org.apache.jmeter.config.PressurePtlFileConfig;
 import org.apache.jmeter.engine.util.NoThreadClone;
 import org.apache.jmeter.gui.GuiPackage;
-import org.apache.jmeter.samplers.Clearable;
-import org.apache.jmeter.samplers.Remoteable;
-import org.apache.jmeter.samplers.SampleEvent;
-import org.apache.jmeter.samplers.SampleListener;
-import org.apache.jmeter.samplers.SampleResult;
-import org.apache.jmeter.samplers.SampleSaveConfiguration;
+import org.apache.jmeter.samplers.*;
 import org.apache.jmeter.save.CSVSaveService;
 import org.apache.jmeter.save.SaveService;
 import org.apache.jmeter.services.CsvPositionRecord;
@@ -59,9 +39,11 @@ import org.apache.jorphan.util.JMeterError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.shulie.jmeter.tool.amdb.GlobalVariables;
-import io.shulie.jmeter.tool.amdb.log.data.pusher.LogPusher;
-import io.shulie.jmeter.tool.executors.ExecutorServiceFactory;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class handles all saving of samples.
@@ -330,6 +312,9 @@ public class ResultCollector extends AbstractListenerElement implements SampleLi
 
     @Override
     public void testStarted(String host) {
+        // initialize class PradarCoreUtils
+        log.info("initialize PradarCoreUtils, 当前ip:{}", PradarCoreUtils.getLocalAddress());
+
         synchronized(LOCK){
             if (instanceCount == 0) { // Only add the hook once
                 shutdownHook = new Thread(new ShutdownHook());
@@ -358,8 +343,6 @@ public class ResultCollector extends AbstractListenerElement implements SampleLi
             }
 
         }
-        // initialize class PradarCoreUtils
-        log.info("initialize PradarCoreUtils, 当前ip:{}", PradarCoreUtils.getLocalAddress());
         inTest = true;
 
         if(summariser != null) {
@@ -381,6 +364,12 @@ public class ResultCollector extends AbstractListenerElement implements SampleLi
                     } catch (InterruptedException e) {
                         log.error("等待日志上传完成异常，可能会有【{}】条日志丢失", GlobalVariables.enqueueCount.get() - GlobalVariables.uploadCount.get());
                     }
+                }
+                //最后sleep 1s，确保数据都已传完
+                try {
+                    TimeUnit.MILLISECONDS.sleep(1000);
+                } catch (InterruptedException e) {
+                    log.error("sleep 1s Interrupted", e);
                 }
             }
         }
