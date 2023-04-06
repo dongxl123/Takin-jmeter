@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import io.shulie.jmeter.tool.amdb.utils.PradarCoreUtils;
 import org.apache.jmeter.config.PressurePtlFileConfig;
 import org.apache.jmeter.engine.util.NoThreadClone;
 import org.apache.jmeter.gui.GuiPackage;
@@ -357,6 +358,8 @@ public class ResultCollector extends AbstractListenerElement implements SampleLi
             }
 
         }
+        // initialize class PradarCoreUtils
+        log.info("initialize PradarCoreUtils, 当前ip:{}", PradarCoreUtils.getLocalAddress());
         inTest = true;
 
         if(summariser != null) {
