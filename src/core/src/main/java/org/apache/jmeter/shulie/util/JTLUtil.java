@@ -91,6 +91,12 @@ public abstract class JTLUtil {
             , "p-pradar-cluster-test: 1", "p-pradar-cluster-test: true"};
 
     /**
+     * 通用压测标
+     */
+    public static final String COMMON_HEADER_PERFORMANCE_TEST_KEY = "p-pradar-cluster-test";
+    public static final String COMMON_HEADER_PERFORMANCE_TEST_VALUE = "true";
+
+    /**
      * 压力引擎应用名称
      */
     private static final String PRESSURE_ENGINE_APPLICATION_NAME = "pressure-engine";
@@ -184,20 +190,28 @@ public abstract class JTLUtil {
         //cost
         text.append(sample.getTime());
         URL url = sample.getURL();
-        if (null == url) {
+        if (StringUtils.isNotBlank(sample.getMqType())) {
             //mq类型
             text.append(sample.getMqType());
             //serviceName
             text.append(sample.getMqTopic());
             //methodName
             text.append(sample.getMqPartition());
-        } else {
+        } else if (Objects.nonNull(url) && JTLUtil.HTTP_AND_HTTPS_PROTOCOL.contains(url.getProtocol())) {
             //middlewarename
             text.append(url.getProtocol());
             //serviceName
             text.append(url.getPath());
             //methodName
             text.append(sample.getHTTPMethod());
+        } else {
+            //通用处理
+            //middlewarename
+            text.append(sample.getMiddlewareName());
+            //serviceName
+            text.append(sample.getServiceName());
+            //methodName
+            text.append(sample.getMethodName());
         }
         //resultCode  00 成功  01 响应失败  05 断言失败
         boolean responseSuccess = "200".equals(sample.getResponseCode());

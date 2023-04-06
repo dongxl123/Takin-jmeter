@@ -17,24 +17,8 @@
 
 package org.apache.jmeter.save;
 
-import java.io.BufferedReader;
-import java.io.CharArrayWriter;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import javax.swing.table.DefaultTableModel;
-
+import io.shulie.jmeter.tool.amdb.GlobalVariables;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.map.LinkedMap;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -48,7 +32,6 @@ import org.apache.jmeter.samplers.StatisticalSampleResult;
 import org.apache.jmeter.shulie.constants.PressureConstants;
 import org.apache.jmeter.shulie.util.JTLUtil;
 import org.apache.jmeter.shulie.util.model.TraceBizData;
-import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.Visualizer;
 import org.apache.jorphan.reflect.Functor;
@@ -60,7 +43,12 @@ import org.apache.oro.text.regex.Perl5Matcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.shulie.jmeter.tool.amdb.GlobalVariables;
+import javax.swing.table.DefaultTableModel;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * This class provides a means for saving/reading test results as CSV files.
@@ -1140,6 +1128,23 @@ public final class CSVSaveService {
                             break;
                         }
                     }
+                }
+            }
+            TraceBizData traceBizData = TraceBizData.create(traceId, reportId, performanceTest);
+            if (JTLUtil.isTraceSampled(traceId, samplingInterval, sampleResult)) {
+                writeLog(sampleResult, out, saveConfig, traceBizData);
+            }
+        }
+        //通用中间件处理
+        if (StringUtils.isNotBlank(sampleResult.getMiddlewareName())) {
+            //是否压测
+            if (MapUtils.isNotEmpty(sampleResult.getCommonHeaders())) {
+                //是否压测
+                for (Map.Entry<String, String> header : sampleResult.getCommonHeaders().entrySet()) {
+                    if (StringUtils.equals(header.getKey(), JTLUtil.COMMON_HEADER_PERFORMANCE_TEST_KEY)
+                            && StringUtils.equals(header.getValue(), JTLUtil.COMMON_HEADER_PERFORMANCE_TEST_VALUE))
+                        performanceTest = true;
+                    break;
                 }
             }
             TraceBizData traceBizData = TraceBizData.create(traceId, reportId, performanceTest);

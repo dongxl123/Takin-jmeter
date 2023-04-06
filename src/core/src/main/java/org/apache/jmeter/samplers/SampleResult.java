@@ -23,10 +23,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -284,6 +281,45 @@ public class SampleResult implements Serializable, Cloneable, Searchable {
         this.mqPartition = mqPartition;
     }
     //add end
+
+    //add common
+    private String middlewareName = "unkown";
+    private String serviceName = "unkown";
+    private String methodName = "unkown";
+    private Map<String, String> commonHeaders;
+
+    public String getMiddlewareName() {
+        return middlewareName;
+    }
+
+    public void setMiddlewareName(String middlewareName) {
+        this.middlewareName = middlewareName;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public String getMethodName() {
+        return methodName;
+    }
+
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
+    }
+
+    public Map<String, String> getCommonHeaders() {
+        return commonHeaders;
+    }
+
+    public void setCommonHeaders(Map<String, String> commonHeaders) {
+        this.commonHeaders = commonHeaders;
+    }
+    //add common end
 
     private List<AssertionResult> assertionResults;
 
