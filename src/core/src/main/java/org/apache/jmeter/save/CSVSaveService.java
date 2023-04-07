@@ -1138,14 +1138,16 @@ public final class CSVSaveService {
         //通用中间件处理
         if (StringUtils.isNotBlank(sampleResult.getMiddlewareName())) {
             //是否压测
-            if (MapUtils.isNotEmpty(sampleResult.getCommonHeaders())) {
+            Map<String, String> commonHeaders = sampleResult.getCommonHeaders();
+            if (MapUtils.isNotEmpty(commonHeaders)) {
                 //是否压测
-                for (Map.Entry<String, String> header : sampleResult.getCommonHeaders().entrySet()) {
+                for (Map.Entry<String, String> header : commonHeaders.entrySet()) {
                     if (StringUtils.equals(header.getKey(), JTLUtil.COMMON_HEADER_PERFORMANCE_TEST_KEY)
                             && StringUtils.equals(header.getValue(), JTLUtil.COMMON_HEADER_PERFORMANCE_TEST_VALUE))
                         performanceTest = true;
                     break;
                 }
+                traceId = commonHeaders.get(JTLUtil.COMMON_HEADER_TRACEID_KEY);
             }
             TraceBizData traceBizData = TraceBizData.create(traceId, reportId, performanceTest);
             if (JTLUtil.isTraceSampled(traceId, samplingInterval, sampleResult)) {

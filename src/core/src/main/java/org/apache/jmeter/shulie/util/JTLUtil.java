@@ -97,6 +97,11 @@ public abstract class JTLUtil {
     public static final String COMMON_HEADER_PERFORMANCE_TEST_VALUE = "true";
 
     /**
+     * traceId头
+     */
+    public static final String COMMON_HEADER_TRACEID_KEY = "p-pradar-traceid";
+
+    /**
      * 压力引擎应用名称
      */
     private static final String PRESSURE_ENGINE_APPLICATION_NAME = "pressure-engine";
