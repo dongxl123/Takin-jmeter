@@ -17,6 +17,7 @@
 
 package org.apache.jmeter.save;
 
+import com.alibaba.fastjson.JSON;
 import io.shulie.jmeter.tool.amdb.GlobalVariables;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.map.LinkedMap;
@@ -1136,15 +1137,17 @@ public final class CSVSaveService {
         }
         //通用中间件处理
         if (StringUtils.isNotBlank(sampleResult.getMiddlewareName())) {
+            log.info("middleware: {}", JSON.toJSONString(sampleResult));
             //是否压测
             Map<String, String> commonHeaders = sampleResult.getCommonHeaders();
             if (MapUtils.isNotEmpty(commonHeaders)) {
                 //是否压测
                 for (Map.Entry<String, String> header : commonHeaders.entrySet()) {
                     if (StringUtils.equals(header.getKey(), JTLUtil.COMMON_HEADER_PERFORMANCE_TEST_KEY)
-                            && StringUtils.equals(header.getValue(), JTLUtil.COMMON_HEADER_PERFORMANCE_TEST_VALUE))
+                            && StringUtils.equals(header.getValue(), JTLUtil.COMMON_HEADER_PERFORMANCE_TEST_VALUE)) {
                         performanceTest = true;
-                    break;
+                        break;
+                    }
                 }
                 traceId = commonHeaders.get(JTLUtil.COMMON_HEADER_TRACEID_KEY);
             }
