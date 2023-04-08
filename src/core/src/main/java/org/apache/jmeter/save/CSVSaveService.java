@@ -1137,7 +1137,6 @@ public final class CSVSaveService {
         }
         //通用中间件处理
         if (StringUtils.isNotBlank(sampleResult.getMiddlewareName())) {
-            log.info("middleware: {}", JSON.toJSONString(sampleResult));
             //是否压测
             Map<String, String> commonHeaders = sampleResult.getCommonHeaders();
             if (MapUtils.isNotEmpty(commonHeaders)) {
