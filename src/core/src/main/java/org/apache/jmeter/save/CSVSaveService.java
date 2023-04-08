@@ -1093,7 +1093,7 @@ public final class CSVSaveService {
             return;
         }
         String traceId = null;
-        String reportId = null;
+        String reportId = String.valueOf(PressureConstants.pressureEngineParamsInstance.getResultId());
         boolean performanceTest = false;
         boolean isMq = false;
         if (StringUtils.isNotBlank(sampleResult.getMqType()) && sampleResult.getMqType().length() > 0) {
@@ -1101,7 +1101,6 @@ public final class CSVSaveService {
         }
         if (isMq) {
             traceId = sampleResult.getMqTraceId();
-            reportId = String.valueOf(PressureConstants.pressureEngineParamsInstance.getResultId());
             if (sampleResult.getMqTopic().startsWith("PT_")) {
                 performanceTest = true;
             }
