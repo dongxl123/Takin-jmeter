@@ -17,7 +17,6 @@
 
 package org.apache.jmeter.save;
 
-import com.alibaba.fastjson.JSON;
 import io.shulie.jmeter.tool.amdb.GlobalVariables;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.collections4.map.LinkedMap;
