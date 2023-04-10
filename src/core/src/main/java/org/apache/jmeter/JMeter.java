@@ -46,6 +46,7 @@ import javax.script.ScriptException;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.cli.avalon.CLArgsParser;
 import org.apache.commons.cli.avalon.CLOption;
 import org.apache.commons.cli.avalon.CLOptionDescriptor;
@@ -76,6 +77,7 @@ import org.apache.jmeter.gui.util.FocusRequester;
 import org.apache.jmeter.plugin.JMeterPlugin;
 import org.apache.jmeter.plugin.PluginManager;
 import org.apache.jmeter.report.config.ConfigurationException;
+import org.apache.jmeter.report.core.JsonUtil;
 import org.apache.jmeter.report.dashboard.ReportGenerator;
 import org.apache.jmeter.reporters.ResultCollector;
 import org.apache.jmeter.reporters.Summariser;
@@ -452,6 +454,7 @@ public class JMeter implements JMeterPlugin {
      * @param params The arguments for JMeter
      */
     public void start(PressureEngineParams params) {
+        log.info(" >>> 启动参数: {}", JSON.toJSONString(params));
         CLArgsParser parser = new CLArgsParser(params.getJmeterArgs(), options);
         String error = parser.getErrorString();
         if (error == null) {// Check option combinations
