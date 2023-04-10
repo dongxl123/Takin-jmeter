@@ -17,36 +17,7 @@
 
 package org.apache.jmeter;
 
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.Authenticator;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.SocketException;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-
-import javax.script.Bindings;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-import javax.swing.JTree;
-import javax.swing.tree.TreePath;
-
-import com.alibaba.fastjson.JSON;
+import com.thoughtworks.xstream.converters.ConversionException;
 import org.apache.commons.cli.avalon.CLArgsParser;
 import org.apache.commons.cli.avalon.CLOption;
 import org.apache.commons.cli.avalon.CLOptionDescriptor;
@@ -56,20 +27,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.config.PressurePtlFileConfig;
 import org.apache.jmeter.control.ReplaceableController;
-import org.apache.jmeter.engine.ClientJMeterEngine;
-import org.apache.jmeter.engine.DistributedRunner;
-import org.apache.jmeter.engine.JMeterEngine;
-import org.apache.jmeter.engine.RemoteJMeterEngineImpl;
-import org.apache.jmeter.engine.StandardJMeterEngine;
-import org.apache.jmeter.engine.TreeCloner;
+import org.apache.jmeter.engine.*;
 import org.apache.jmeter.exceptions.IllegalUserActionException;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.gui.MainFrame;
-import org.apache.jmeter.gui.action.ActionNames;
-import org.apache.jmeter.gui.action.ActionRouter;
-import org.apache.jmeter.gui.action.Load;
-import org.apache.jmeter.gui.action.LoadRecentProject;
-import org.apache.jmeter.gui.action.LookAndFeelCommand;
+import org.apache.jmeter.gui.action.*;
 import org.apache.jmeter.gui.tree.JMeterTreeListener;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.gui.tree.JMeterTreeNode;
@@ -77,7 +39,6 @@ import org.apache.jmeter.gui.util.FocusRequester;
 import org.apache.jmeter.plugin.JMeterPlugin;
 import org.apache.jmeter.plugin.PluginManager;
 import org.apache.jmeter.report.config.ConfigurationException;
-import org.apache.jmeter.report.core.JsonUtil;
 import org.apache.jmeter.report.dashboard.ReportGenerator;
 import org.apache.jmeter.reporters.ResultCollector;
 import org.apache.jmeter.reporters.Summariser;
@@ -110,7 +71,19 @@ import org.apache.logging.log4j.core.config.Configurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thoughtworks.xstream.converters.ConversionException;
+import javax.script.*;
+import javax.swing.*;
+import javax.swing.tree.TreePath;
+import java.awt.event.ActionEvent;
+import java.io.*;
+import java.net.*;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * Main JMeter class; processes options and starts the GUI, non-GUI or server as appropriate.
