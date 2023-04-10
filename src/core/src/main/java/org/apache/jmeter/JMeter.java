@@ -454,7 +454,7 @@ public class JMeter implements JMeterPlugin {
      * @param params The arguments for JMeter
      */
     public void start(PressureEngineParams params) {
-        log.info(" >>> 启动参数: {}", JSON.toJSONString(params));
+        log.info(" >>> 启动参数: {}", params);
         CLArgsParser parser = new CLArgsParser(params.getJmeterArgs(), options);
         String error = parser.getErrorString();
         if (error == null) {// Check option combinations
