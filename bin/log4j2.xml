@@ -32,7 +32,7 @@
         <DefaultRolloverStrategy max="5" />
     </RollingFile>
     -->
-    <File name="jmeter-log" fileName="${sys:jmeter.logfile:-jmeter.log}" append="false">
+    <File name="jmeter-log" fileName="${sys:jmeter.logfile:-jmeter.log}">
         <PatternLayout>
             <pattern>%d %p %c{1.}: %m%n</pattern>
         </PatternLayout>
