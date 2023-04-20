@@ -29,6 +29,7 @@ import org.apache.jmeter.config.PressurePtlFileConfig;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.samplers.SampleSaveConfiguration;
 import org.apache.jmeter.save.CSVSaveService;
+import org.apache.jmeter.shulie.util.model.MiddlewareType;
 import org.apache.jmeter.shulie.util.model.TraceBizData;
 
 import com.alibaba.fastjson.JSON;
@@ -189,20 +190,20 @@ public abstract class JTLUtil {
         //invokeId
         text.append("0");
         //invokeType
-        text.append("0");
+        text.append(sample.getInvokeType());
         //appName
         text.append(PRESSURE_ENGINE_APPLICATION_NAME);
         //cost
         text.append(sample.getTime());
         URL url = sample.getURL();
-        if (StringUtils.isNotBlank(sample.getMqType())) {
+        if (MiddlewareType.TYPE_MQ == sample.getInvokeType()) {
             //mq类型
             text.append(sample.getMqType());
             //serviceName
             text.append(sample.getMqTopic());
             //methodName
             text.append(sample.getMqPartition());
-        } else if (Objects.nonNull(url) && JTLUtil.HTTP_AND_HTTPS_PROTOCOL.contains(url.getProtocol())) {
+        } else if (MiddlewareType.TYPE_WEB_SERVER == sample.getInvokeType()) {
             //middlewarename
             text.append(url.getProtocol());
             //serviceName

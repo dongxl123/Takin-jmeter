@@ -31,6 +31,7 @@ import org.apache.jmeter.samplers.SampleSaveConfiguration;
 import org.apache.jmeter.samplers.StatisticalSampleResult;
 import org.apache.jmeter.shulie.constants.PressureConstants;
 import org.apache.jmeter.shulie.util.JTLUtil;
+import org.apache.jmeter.shulie.util.model.MiddlewareType;
 import org.apache.jmeter.shulie.util.model.TraceBizData;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.Visualizer;
@@ -1095,64 +1096,54 @@ public final class CSVSaveService {
         String traceId = null;
         String reportId = String.valueOf(PressureConstants.pressureEngineParamsInstance.getResultId());
         boolean performanceTest = false;
-        boolean isMq = false;
-        if (StringUtils.isNotBlank(sampleResult.getMqType()) && sampleResult.getMqType().length() > 0) {
-            isMq = true;
-        }
-        if (isMq) {
-            traceId = sampleResult.getMqTraceId();
-            if (sampleResult.getMqTopic().startsWith("PT_")) {
-                performanceTest = true;
-            }
-            TraceBizData traceBizData = TraceBizData.create(traceId, reportId, performanceTest);
-            if (JTLUtil.isTraceSampled(traceId, samplingInterval, sampleResult)) {
-                writeLog(sampleResult, out, saveConfig, traceBizData);
-            }
-        }
-        //是否http或者https协议
-        boolean isHttp = Objects.nonNull(sampleResult.getURL()) && JTLUtil.HTTP_AND_HTTPS_PROTOCOL.contains(sampleResult.getURL().getProtocol());
-        if (isHttp) {
-            String[] headers = sampleResult.getRequestHeaders().split("\n");
-            //是否压测
-            for (String header : headers) {
-                if (header.startsWith(JTLUtil.TRACE_ID_HEADER_KEY_PREFIX)) {
-                    traceId = header.replaceAll(JTLUtil.TRACE_ID_HEADER_KEY_PREFIX, JTLUtil.EMPTY_TEXT);
-                } else if (header.startsWith(JTLUtil.REPORT_ID_HEADER_KEY_PREFIX)) {
-                    reportId = header.replaceAll(JTLUtil.REPORT_ID_HEADER_KEY_PREFIX, JTLUtil.EMPTY_TEXT);
-                } else {
-                    //满足任意一个即可
-                    for (String performanceTestHeader : JTLUtil.PERFOMANCE_TEST_HEADERS) {
-                        if (header.startsWith(performanceTestHeader)) {
-                            performanceTest = true;
-                            break;
+        switch (sampleResult.getInvokeType()) {
+            case MiddlewareType.TYPE_MQ:
+                traceId = sampleResult.getMqTraceId();
+                if (sampleResult.getMqTopic().startsWith("PT_")) {
+                    performanceTest = true;
+                }
+                break;
+            case MiddlewareType.TYPE_WEB_SERVER:
+                //是否http或者https协议
+                String[] headers = sampleResult.getRequestHeaders().split("\n");
+                //是否压测
+                for (String header : headers) {
+                    if (header.startsWith(JTLUtil.TRACE_ID_HEADER_KEY_PREFIX)) {
+                        traceId = header.replaceAll(JTLUtil.TRACE_ID_HEADER_KEY_PREFIX, JTLUtil.EMPTY_TEXT);
+                    } else if (header.startsWith(JTLUtil.REPORT_ID_HEADER_KEY_PREFIX)) {
+                        reportId = header.replaceAll(JTLUtil.REPORT_ID_HEADER_KEY_PREFIX, JTLUtil.EMPTY_TEXT);
+                    } else {
+                        //满足任意一个即可
+                        for (String performanceTestHeader : JTLUtil.PERFOMANCE_TEST_HEADERS) {
+                            if (header.startsWith(performanceTestHeader)) {
+                                performanceTest = true;
+                                break;
+                            }
                         }
                     }
                 }
-            }
-            TraceBizData traceBizData = TraceBizData.create(traceId, reportId, performanceTest);
-            if (JTLUtil.isTraceSampled(traceId, samplingInterval, sampleResult)) {
-                writeLog(sampleResult, out, saveConfig, traceBizData);
-            }
-        }
-        //通用中间件处理
-        if (StringUtils.isNotBlank(sampleResult.getMiddlewareName())) {
-            //是否压测
-            Map<String, String> commonHeaders = sampleResult.getCommonHeaders();
-            if (MapUtils.isNotEmpty(commonHeaders)) {
-                //是否压测
-                for (Map.Entry<String, String> header : commonHeaders.entrySet()) {
-                    if (StringUtils.equals(header.getKey(), JTLUtil.COMMON_HEADER_PERFORMANCE_TEST_KEY)
-                            && StringUtils.equals(header.getValue(), JTLUtil.COMMON_HEADER_PERFORMANCE_TEST_VALUE)) {
-                        performanceTest = true;
-                        break;
+                break;
+            default:
+                //通用中间件处理
+                if (StringUtils.isNotBlank(sampleResult.getMiddlewareName())) {
+                    //是否压测
+                    Map<String, String> commonHeaders = sampleResult.getCommonHeaders();
+                    if (MapUtils.isNotEmpty(commonHeaders)) {
+                        //是否压测
+                        for (Map.Entry<String, String> header : commonHeaders.entrySet()) {
+                            if (StringUtils.equals(header.getKey(), JTLUtil.COMMON_HEADER_PERFORMANCE_TEST_KEY)
+                                    && StringUtils.equals(header.getValue(), JTLUtil.COMMON_HEADER_PERFORMANCE_TEST_VALUE)) {
+                                performanceTest = true;
+                                break;
+                            }
+                        }
+                        traceId = commonHeaders.get(JTLUtil.COMMON_HEADER_TRACEID_KEY);
                     }
                 }
-                traceId = commonHeaders.get(JTLUtil.COMMON_HEADER_TRACEID_KEY);
-            }
-            TraceBizData traceBizData = TraceBizData.create(traceId, reportId, performanceTest);
-            if (JTLUtil.isTraceSampled(traceId, samplingInterval, sampleResult)) {
-                writeLog(sampleResult, out, saveConfig, traceBizData);
-            }
+        }
+        TraceBizData traceBizData = TraceBizData.create(traceId, reportId, performanceTest);
+        if (JTLUtil.isTraceSampled(traceId, samplingInterval, sampleResult)) {
+            writeLog(sampleResult, out, saveConfig, traceBizData);
         }
         if (Objects.nonNull(sampleResult.getSubResults()) && sampleResult.getSubResults().length > 0) {
             for (SampleResult result : sampleResult.getSubResults()) {

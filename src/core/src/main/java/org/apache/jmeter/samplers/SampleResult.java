@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.jmeter.assertions.AssertionResult;
 import org.apache.jmeter.gui.Searchable;
+import org.apache.jmeter.shulie.util.model.MiddlewareType;
 import org.apache.jmeter.testelement.TestPlan;
 import org.apache.jmeter.threads.JMeterContext.TestLogicalAction;
 import org.apache.jmeter.util.JMeterUtils;
@@ -282,11 +283,21 @@ public class SampleResult implements Serializable, Cloneable, Searchable {
     }
     //add end
 
+    //调用类型
+    private int invokeType = MiddlewareType.TYPE_WEB_SERVER;
     //add common
     private String middlewareName = "unkown";
     private String serviceName = "unkown";
     private String methodName = "unkown";
     private Map<String, String> commonHeaders;
+
+    public int getInvokeType() {
+        return invokeType;
+    }
+
+    public void setInvokeType(int invokeType) {
+        this.invokeType = invokeType;
+    }
 
     public String getMiddlewareName() {
         return middlewareName;
