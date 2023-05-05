@@ -50,11 +50,11 @@ public class HttpNotifyTroCloudUtils {
         //launcher包中没有日志组件，使用systemout打印日志
         Map<String, Object> requestParams = new HashMap<>();
         requestParams.put("sceneId", params.getSceneId());
-        requestParams.put("resultId", params.getResultId());
-        requestParams.put("customerId", params.getCustomerId());
+        requestParams.put("taskId", params.getResultId());
+        requestParams.put("tenantId", params.getCustomerId());
         //pod 序号
         String podNumber = System.getProperty("pod.number");
-        requestParams.put("podNum", podNumber == null ? "" : podNumber);
+        requestParams.put("podNo", podNumber == null ? "" : podNumber);
         requestParams.put("status", status);
         requestParams.put("msg", PRESSURE_ENGINE_EXCEPTION_PREFIX + errMsg);
         try {
